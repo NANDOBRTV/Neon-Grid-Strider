@@ -9,5 +9,11 @@ export const CONFIG = {
   },
   TRAIL_LENGTH: 25,
   TRAIL_OPACITY_STEP: 0.05,
-  PLATFORM: 'MOBILE'
+  PLATFORM: 'MOBILE',
+  SPRITE: {
+    WIDTH: 16,
+    HEIGHT: 16,
+    SCALE: 2.5,
+    ANIM_SPEED: 0.15
+  }
 };

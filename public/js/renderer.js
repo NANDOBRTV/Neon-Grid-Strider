@@ -4,6 +4,17 @@ export class Renderer {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.sprites = {};
+    this.loadSprites();
+  }
+
+  loadSprites() {
+    const colors = ['green', 'red', 'blue', 'yellow'];
+    colors.forEach(color => {
+      const img = new Image();
+      img.src = `assets/sprites/ninja_${color}.png`;
+      this.sprites[color] = img;
+    });
   }
 
   clear() {
@@ -53,6 +64,26 @@ export class Renderer {
     ctx.restore();
   }
 
+  getAnimationState(player) {
+    // Determinar direção baseada no movimento ou última direção
+    let row = 0; // Down (default)
+    if (player.velY < 0) row = 1; // Up
+    else if (player.velX < 0) row = 2; // Left
+    else if (player.velX > 0) row = 3; // Right
+
+    // Se estiver atacando, usar linhas de ataque (Attack é tipicamente nas linhas 12-15)
+    if (player.isAttacking) {
+      row += 12;
+    }
+
+    // Calcular frame de animação
+    const isMoving = Math.abs(player.velX || 0) > 0.1 || Math.abs(player.velY || 0) > 0.1;
+    const frameCount = 4; // Spritesheets do NinjaAdventure costumam ter 4 frames por animação
+    const frame = isMoving ? Math.floor((Date.now() / (1000 * CONFIG.SPRITE.ANIM_SPEED)) % frameCount) : 0;
+
+    return { row, frame };
+  }
+
   drawPlayer(player, isMe) {
     const { ctx } = this;
     if (!player.x || !player.y) return;
@@ -61,26 +92,44 @@ export class Renderer {
 
     ctx.save();
     
-    // Aplicar offset de pulo
     const yOffset = player.jumpOffset || 0;
     const drawY = player.y - yOffset;
     
-    // Corpo e Brilho
-    ctx.beginPath();
-    ctx.fillStyle = player.color || '#fff';
-    ctx.shadowColor = player.color || '#fff';
-    ctx.shadowBlur = CONFIG.SHADOW_BLUR;
-    ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
+    // Tentar desenhar Sprite
+    const colorKey = this.getSpriteColorKey(player.color);
+    const spriteImg = this.sprites[colorKey];
 
-    // Efeito de Ataque (aura vermelha)
+    if (spriteImg && spriteImg.complete) {
+      const { row, frame } = this.getAnimationState(player);
+      const sW = CONFIG.SPRITE.WIDTH;
+      const sH = CONFIG.SPRITE.HEIGHT;
+      const scale = CONFIG.SPRITE.SCALE;
+      const dW = sW * scale;
+      const dH = sH * scale;
+
+      ctx.drawImage(
+        spriteImg,
+        frame * sW, row * sH, sW, sH, // Source
+        player.x - dW / 2, drawY - dH / 2, dW, dH // Destination
+      );
+    } else {
+      // Fallback para círculo se a imagem não carregar
+      ctx.beginPath();
+      ctx.fillStyle = player.color || '#fff';
+      ctx.shadowColor = player.color || '#fff';
+      ctx.shadowBlur = CONFIG.SHADOW_BLUR;
+      ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Efeito de Ataque adicional
     if (player.isAttacking) {
       ctx.beginPath();
       ctx.strokeStyle = '#ff0055';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2;
       ctx.shadowColor = '#ff0055';
-      ctx.shadowBlur = 20;
-      ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS + 8, 0, Math.PI * 2);
+      ctx.shadowBlur = 10;
+      ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS + 10, 0, Math.PI * 2);
       ctx.stroke();
     }
 
@@ -90,8 +139,18 @@ export class Renderer {
     ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
     const displayName = isMe ? `${player.username} (Você)` : player.username;
-    ctx.fillText(displayName, player.x, drawY - 18);
+    ctx.fillText(displayName, player.x, drawY - 25);
     
     ctx.restore();
+  }
+
+  getSpriteColorKey(hex) {
+    // Mapear cores hex para os sprites disponíveis
+    if (!hex) return 'green';
+    const h = hex.toLowerCase();
+    if (h.includes('ff0000') || h.includes('red')) return 'red';
+    if (h.includes('0000ff') || h.includes('blue')) return 'blue';
+    if (h.includes('ffff00') || h.includes('yellow')) return 'yellow';
+    return 'green';
   }
 }

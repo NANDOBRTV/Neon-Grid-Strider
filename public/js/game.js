@@ -149,10 +149,13 @@ function update() {
 
   const oldX = me.x;
   const oldY = me.y;
-
   me.x = Math.max(10, Math.min(canvas.width - 10, me.x + dx));
   me.y = Math.max(10, Math.min(canvas.height - 10, me.y + dy));
   
+  // Guardar velocidades para animação
+  me.velX = dx;
+  me.velY = dy;
+
   if (!me.jumpOffset) me.jumpOffset = 0;
   me.jumpOffset = state.jumpVelocity;
 
@@ -166,7 +169,9 @@ function update() {
       y: me.y,
       trail: me.trail,
       jumpOffset: me.jumpOffset,
-      isJumping: state.isJumping
+      isJumping: state.isJumping,
+      velX: me.velX,
+      velY: me.velY
     });
   }
 }

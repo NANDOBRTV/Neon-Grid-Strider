@@ -36,10 +36,12 @@ module.exports = (io) => {
       const safePosition = sanitizePosition(movementData);
       activePlayers[socket.id].x = safePosition.x;
       activePlayers[socket.id].y = safePosition.y;
-      // Repassa a trilha se ela existir nos dados recebidos
-      if (movementData.trail) {
-        activePlayers[socket.id].trail = movementData.trail;
-      }
+      // Repassa dados adicionais para animação e trilha
+      activePlayers[socket.id].trail = movementData.trail || [];
+      activePlayers[socket.id].velX = movementData.velX || 0;
+      activePlayers[socket.id].velY = movementData.velY || 0;
+      activePlayers[socket.id].jumpOffset = movementData.jumpOffset || 0;
+      activePlayers[socket.id].isJumping = movementData.isJumping || false;
 
       socket.broadcast.emit('player_moved', activePlayers[socket.id]);
     });
