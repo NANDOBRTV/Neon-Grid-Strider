@@ -1,7 +1,9 @@
 import { CONFIG } from './constants.js';
 import { Renderer } from './renderer.js';
+import { Joystick } from './joystick.js';
 
 const socket = io();
+const joystick = new Joystick('joystickZone', 'joystickStick', 'joystickBase');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const renderer = new Renderer(canvas, ctx);
@@ -101,17 +103,25 @@ function update() {
   let dy = 0;
   const keys = state.keys;
   
-  if (keys.has('arrowup') || keys.has('w')) dy -= CONFIG.SPEED;
-  if (keys.has('arrowdown') || keys.has('s')) dy += CONFIG.SPEED;
-  if (keys.has('arrowleft') || keys.has('a')) dx -= CONFIG.SPEED;
-  if (keys.has('arrowright') || keys.has('d')) dx += CONFIG.SPEED;
-
-  if (dx !== 0 || dy !== 0) {
+  const joystickInput = joystick.getInput();
+  
+  if (joystickInput.x !== 0 || joystickInput.y !== 0) {
+    dx = joystickInput.x * CONFIG.SPEED;
+    dy = joystickInput.y * CONFIG.SPEED;
+  } else {
+    if (keys.has('arrowup') || keys.has('w')) dy -= CONFIG.SPEED;
+    if (keys.has('arrowdown') || keys.has('s')) dy += CONFIG.SPEED;
+    if (keys.has('arrowleft') || keys.has('a')) dx -= CONFIG.SPEED;
+    if (keys.has('arrowright') || keys.has('d')) dx += CONFIG.SPEED;
+    
     if (dx !== 0 && dy !== 0) {
       const factor = 1 / Math.sqrt(2);
       dx *= factor;
       dy *= factor;
     }
+  }
+
+  if (dx !== 0 || dy !== 0) {
 
     const me = state.players[state.myId];
     const oldX = me.x;
