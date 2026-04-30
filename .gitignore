@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+neon_grid.db
+neon_grid.db-journal
+pnpm-lock.yaml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
