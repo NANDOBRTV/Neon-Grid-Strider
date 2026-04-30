@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Grid Strider</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="screen-wrap">
+      <section id="authScreen" class="screen active">
+        <h1>Neon Grid Strider</h1>
+        <p>Login / Registro</p>
+        <input id="authUser" placeholder="Usuário" maxlength="24" />
+        <input id="authPass" type="password" placeholder="Senha" maxlength="32" />
+        <div class="row">
+          <button id="loginBtn">Entrar</button>
+          <button id="registerBtn">Registrar</button>
+        </div>
+        <p id="authMsg" class="muted"></p>
+      </section>
+
+      <section id="loadingCharacter" class="screen">
+        <h2>Carregando seleção de personagem...</h2>
+        <div class="loader"></div>
+      </section>
+
+      <section id="characterScreen" class="screen">
+        <h2>Escolha seu personagem</h2>
+        <div id="characterList" class="character-list"></div>
+        <button id="confirmCharacterBtn">Confirmar personagem</button>
+      </section>
+
+      <section id="loadingGame" class="screen">
+        <h2>Preparando partida 2D...</h2>
+        <div class="loader"></div>
+      </section>
+
+      <section id="gameScreen" class="screen">
+        <header class="game-hud">
+          <span id="playerInfo"></span>
+        </header>
+        <canvas id="gameCanvas" width="1000" height="500"></canvas>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
