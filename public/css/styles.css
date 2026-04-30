@@ -256,3 +256,90 @@ button:active {
     font-size: 10px;
   }
 }
+
+
+/* Action Buttons */
+.action-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  flex-direction: column;
+}
+
+.action-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: rgba(18, 25, 43, 0.9);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(43, 227, 255, 0.2);
+  transition: all 0.15s ease-out;
+  touch-action: none;
+}
+
+.action-btn:active {
+  background: rgba(43, 227, 255, 0.3);
+  box-shadow: 0 0 25px rgba(43, 227, 255, 0.6);
+  transform: scale(0.95);
+}
+
+.btn-icon {
+  font-size: 24px;
+}
+
+.btn-label {
+  font-size: 10px;
+}
+
+.jump-btn {
+  border-color: #00ff88;
+  color: #00ff88;
+}
+
+.jump-btn:active {
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+}
+
+.attack-btn {
+  border-color: #ff0055;
+  color: #ff0055;
+}
+
+.attack-btn:active {
+  background: rgba(255, 0, 85, 0.2);
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.6);
+}
+
+@media (max-width: 480px) {
+  .action-buttons {
+    top: 15px;
+    right: 15px;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 60px;
+    height: 60px;
+  }
+
+  .btn-icon {
+    font-size: 20px;
+  }
+
+  .btn-label {
+    font-size: 9px;
+  }
+}

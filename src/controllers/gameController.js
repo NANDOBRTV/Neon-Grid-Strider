@@ -54,6 +54,20 @@ module.exports = (io) => {
       io.emit('new_message', message);
     });
 
+    socket.on('player_attack', (attackData) => {
+      if (!activePlayers[socket.id]) return;
+      const attacker = activePlayers[socket.id];
+      const attack = {
+        id: socket.id,
+        username: attacker.username,
+        x: attackData.x,
+        y: attackData.y,
+        color: attacker.color,
+        timestamp: attackData.timestamp
+      };
+      socket.broadcast.emit('player_attack', attack);
+    });
+
     socket.on('disconnect', async () => {
       console.log(`[DESCONEXÃO] Dispositivo saiu: ${socket.id}`);
       if (!activePlayers[socket.id]) return;

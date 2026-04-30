@@ -60,13 +60,29 @@ export class Renderer {
     this.drawTrail(player);
 
     ctx.save();
+    
+    // Aplicar offset de pulo
+    const yOffset = player.jumpOffset || 0;
+    const drawY = player.y - yOffset;
+    
     // Corpo e Brilho
     ctx.beginPath();
     ctx.fillStyle = player.color || '#fff';
     ctx.shadowColor = player.color || '#fff';
     ctx.shadowBlur = CONFIG.SHADOW_BLUR;
-    ctx.arc(player.x, player.y, CONFIG.PLAYER_RADIUS, 0, Math.PI * 2);
+    ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS, 0, Math.PI * 2);
     ctx.fill();
+
+    // Efeito de Ataque (aura vermelha)
+    if (player.isAttacking) {
+      ctx.beginPath();
+      ctx.strokeStyle = '#ff0055';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#ff0055';
+      ctx.shadowBlur = 20;
+      ctx.arc(player.x, drawY, CONFIG.PLAYER_RADIUS + 8, 0, Math.PI * 2);
+      ctx.stroke();
+    }
 
     // Nome
     ctx.shadowBlur = 0;
@@ -74,7 +90,7 @@ export class Renderer {
     ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
     const displayName = isMe ? `${player.username} (Você)` : player.username;
-    ctx.fillText(displayName, player.x, player.y - 18);
+    ctx.fillText(displayName, player.x, drawY - 18);
     
     ctx.restore();
   }
