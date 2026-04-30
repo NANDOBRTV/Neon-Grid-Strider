@@ -2,7 +2,10 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0b0f1a" />
     <title>Neon Grid Strider</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
@@ -21,19 +24,20 @@
           </label>
           <button id="joinBtn">Entrar no jogo</button>
         </div>
-        <p class="desktop-hint">Use as setas ou WASD para se mover.</p>
+        <p class="info-text">Use o joystick para se mover.</p>
       </section>
       
       <div class="game-container">
         <canvas id="gameCanvas" width="1000" height="600"></canvas>
         
-        <!-- Joystick Virtual (Apenas Mobile) -->
+        <!-- Joystick Virtual -->
         <div id="joystickZone" class="joystick-zone">
           <div id="joystickBase" class="joystick-base">
             <div id="joystickStick" class="joystick-stick"></div>
           </div>
         </div>
 
+        <!-- Chat Global -->
         <section class="chat-container">
           <div id="chatMessages" class="chat-messages"></div>
           <div class="chat-input-area">

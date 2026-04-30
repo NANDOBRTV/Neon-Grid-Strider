@@ -19,8 +19,7 @@ const ui = {
 const state = {
   players: {},
   myId: null,
-  joined: false,
-  keys: new Set()
+  joined: false
 };
 
 // Eventos de UI
@@ -42,17 +41,6 @@ ui.joinBtn.addEventListener('click', () => {
   ui.joinBtn.disabled = true;
   ui.joinBtn.innerText = 'No Jogo';
 });
-
-// Input de Teclado
-document.addEventListener('keydown', (e) => {
-  const key = e.key.toLowerCase();
-  if (["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d"].includes(key)) {
-    state.keys.add(key);
-    if (state.joined) e.preventDefault();
-  }
-});
-
-document.addEventListener('keyup', (e) => state.keys.delete(e.key.toLowerCase()));
 
 // Eventos de Socket
 socket.on('connect', () => {
@@ -95,52 +83,34 @@ ui.chatInput.addEventListener('keydown', (e) => {
   }
 });
 
-// Loop Principal
+// Loop Principal - Apenas Joystick
 function update() {
   if (!state.joined || !state.myId || !state.players[state.myId]) return;
 
-  let dx = 0;
-  let dy = 0;
-  const keys = state.keys;
-  
   const joystickInput = joystick.getInput();
   
-  if (joystickInput.x !== 0 || joystickInput.y !== 0) {
-    dx = joystickInput.x * CONFIG.SPEED;
-    dy = joystickInput.y * CONFIG.SPEED;
-  } else {
-    if (keys.has('arrowup') || keys.has('w')) dy -= CONFIG.SPEED;
-    if (keys.has('arrowdown') || keys.has('s')) dy += CONFIG.SPEED;
-    if (keys.has('arrowleft') || keys.has('a')) dx -= CONFIG.SPEED;
-    if (keys.has('arrowright') || keys.has('d')) dx += CONFIG.SPEED;
+  if (joystickInput.x === 0 && joystickInput.y === 0) return;
+
+  let dx = joystickInput.x * CONFIG.SPEED;
+  let dy = joystickInput.y * CONFIG.SPEED;
+
+  const me = state.players[state.myId];
+  const oldX = me.x;
+  const oldY = me.y;
+
+  me.x = Math.max(10, Math.min(canvas.width - 10, me.x + dx));
+  me.y = Math.max(10, Math.min(canvas.height - 10, me.y + dy));
+
+  if (me.x !== oldX || me.y !== oldY) {
+    if (!me.trail) me.trail = [];
+    me.trail.push({ x: me.x, y: me.y });
+    if (me.trail.length > CONFIG.TRAIL_LENGTH) me.trail.shift();
     
-    if (dx !== 0 && dy !== 0) {
-      const factor = 1 / Math.sqrt(2);
-      dx *= factor;
-      dy *= factor;
-    }
-  }
-
-  if (dx !== 0 || dy !== 0) {
-
-    const me = state.players[state.myId];
-    const oldX = me.x;
-    const oldY = me.y;
-
-    me.x = Math.max(10, Math.min(canvas.width - 10, me.x + dx));
-    me.y = Math.max(10, Math.min(canvas.height - 10, me.y + dy));
-
-    if (me.x !== oldX || me.y !== oldY) {
-      if (!me.trail) me.trail = [];
-      me.trail.push({ x: me.x, y: me.y });
-      if (me.trail.length > CONFIG.TRAIL_LENGTH) me.trail.shift();
-      
-      socket.emit('player_movement', { 
-        x: me.x, 
-        y: me.y,
-        trail: me.trail 
-      });
-    }
+    socket.emit('player_movement', { 
+      x: me.x, 
+      y: me.y,
+      trail: me.trail 
+    });
   }
 }
 

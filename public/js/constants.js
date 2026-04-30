@@ -1,5 +1,5 @@
 export const CONFIG = {
-  SPEED: 4,
+  SPEED: 5,
   PLAYER_RADIUS: 10,
   GRID_SIZE: 40,
   SHADOW_BLUR: 15,
@@ -7,6 +7,7 @@ export const CONFIG = {
     GRID: 'rgba(43, 227, 255, 0.1)',
     TEXT: '#e9f6ff'
   },
-  TRAIL_LENGTH: 20,
-  TRAIL_OPACITY_STEP: 0.05
+  TRAIL_LENGTH: 25,
+  TRAIL_OPACITY_STEP: 0.05,
+  PLATFORM: 'MOBILE'
 };
