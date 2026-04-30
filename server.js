@@ -150,10 +150,11 @@ io.on('connection', (socket) => {
       if (err) {
         console.error(`Erro ao atualizar posição final de ${socket.id}:`, err.message);
       }
+      
+      // Remove da memória apenas após tentar salvar ou se houver erro
+      delete activePlayers[socket.id];
+      io.emit('player_disconnected', socket.id);
     });
-
-    delete activePlayers[socket.id];
-    io.emit('player_disconnected', socket.id);
   });
 });
 
