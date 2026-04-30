@@ -27,12 +27,39 @@ export class Renderer {
     ctx.stroke();
   }
 
+  drawTrail(player) {
+    if (!player.trail || player.trail.length < 2) return;
+    const { ctx } = this;
+    
+    ctx.save();
+    ctx.lineWidth = CONFIG.PLAYER_RADIUS * 1.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowBlur = CONFIG.SHADOW_BLUR / 2;
+    ctx.shadowColor = player.color;
+
+    for (let i = 1; i < player.trail.length; i++) {
+      const p1 = player.trail[i - 1];
+      const p2 = player.trail[i];
+      const opacity = (i / player.trail.length) * 0.5;
+      
+      ctx.beginPath();
+      ctx.strokeStyle = player.color;
+      ctx.globalAlpha = opacity;
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   drawPlayer(player, isMe) {
     const { ctx } = this;
     if (!player.x || !player.y) return;
 
+    this.drawTrail(player);
+
     ctx.save();
-    
     // Corpo e Brilho
     ctx.beginPath();
     ctx.fillStyle = player.color || '#fff';

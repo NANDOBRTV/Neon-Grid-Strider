@@ -9,7 +9,9 @@ const renderer = new Renderer(canvas, ctx);
 const ui = {
   username: document.getElementById('username'),
   color: document.getElementById('color'),
-  joinBtn: document.getElementById('joinBtn')
+  joinBtn: document.getElementById('joinBtn'),
+  chatInput: document.getElementById('chatInput'),
+  chatMessages: document.getElementById('chatMessages')
 };
 
 const state = {
@@ -73,6 +75,24 @@ socket.on('player_disconnected', (id) => {
   delete state.players[id];
 });
 
+socket.on('new_message', (msg) => {
+  const msgEl = document.createElement('div');
+  msgEl.className = 'message';
+  msgEl.innerHTML = `<span class="username" style="color: ${msg.color}">${msg.username}:</span> ${msg.text}`;
+  ui.chatMessages.appendChild(msgEl);
+  ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
+});
+
+ui.chatInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const text = ui.chatInput.value.trim();
+    if (text && state.joined) {
+      socket.emit('send_message', text);
+      ui.chatInput.value = '';
+    }
+  }
+});
+
 // Loop Principal
 function update() {
   if (!state.joined || !state.myId || !state.players[state.myId]) return;
@@ -101,7 +121,15 @@ function update() {
     me.y = Math.max(10, Math.min(canvas.height - 10, me.y + dy));
 
     if (me.x !== oldX || me.y !== oldY) {
-      socket.emit('player_movement', { x: me.x, y: me.y });
+      if (!me.trail) me.trail = [];
+      me.trail.push({ x: me.x, y: me.y });
+      if (me.trail.length > CONFIG.TRAIL_LENGTH) me.trail.shift();
+      
+      socket.emit('player_movement', { 
+        x: me.x, 
+        y: me.y,
+        trail: me.trail 
+      });
     }
   }
 }

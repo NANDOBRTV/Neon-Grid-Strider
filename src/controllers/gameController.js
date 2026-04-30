@@ -36,8 +36,22 @@ module.exports = (io) => {
       const safePosition = sanitizePosition(movementData);
       activePlayers[socket.id].x = safePosition.x;
       activePlayers[socket.id].y = safePosition.y;
+      // Repassa a trilha se ela existir nos dados recebidos
+      if (movementData.trail) {
+        activePlayers[socket.id].trail = movementData.trail;
+      }
 
       socket.broadcast.emit('player_moved', activePlayers[socket.id]);
+    });
+
+    socket.on('send_message', (text) => {
+      if (!activePlayers[socket.id] || typeof text !== 'string') return;
+      const message = {
+        username: activePlayers[socket.id].username,
+        text: text.slice(0, 50),
+        color: activePlayers[socket.id].color
+      };
+      io.emit('new_message', message);
     });
 
     socket.on('disconnect', async () => {

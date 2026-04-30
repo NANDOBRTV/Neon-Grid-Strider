@@ -24,6 +24,13 @@
         <p>Use as setas ou WASD para se mover.</p>
       </section>
       <canvas id="gameCanvas" width="1000" height="600"></canvas>
+      
+      <section class="chat-container">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-area">
+          <input id="chatInput" type="text" placeholder="Pressione Enter para falar..." maxlength="50" />
+        </div>
+      </section>
     </main>
 
     <script src="/socket.io/socket.io.js"></script>
