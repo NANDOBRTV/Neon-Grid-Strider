@@ -38,6 +38,13 @@ function showScreen(name) {
   screens[name].classList.add('active');
 }
 
+function setAuthDisabled(disabled) {
+  loginBtn.disabled = disabled;
+  registerBtn.disabled = disabled;
+  authUser.disabled = disabled;
+  authPass.disabled = disabled;
+}
+
 function showLoading(nextScreen, wait = 1200) {
   showScreen(nextScreen === 'character' ? 'loadingCharacter' : 'loadingGame');
   setTimeout(() => showScreen(nextScreen), wait);
@@ -47,6 +54,7 @@ function renderCharacterCards() {
   characterList.innerHTML = '';
   characters.forEach((char) => {
     const card = document.createElement('button');
+    card.type = 'button';
     card.className = 'character-card';
     card.textContent = char.name;
     card.style.borderColor = char.color;
@@ -60,7 +68,17 @@ function renderCharacterCards() {
 }
 
 function auth(action) {
-  socket.emit(action, { username: authUser.value.trim(), password: authPass.value });
+  const username = authUser.value.trim();
+  const password = authPass.value;
+
+  if (!username || !password) {
+    authMsg.textContent = 'Preencha usuário e senha.';
+    return;
+  }
+
+  setAuthDisabled(true);
+  authMsg.textContent = 'Validando...';
+  socket.emit(action, { username, password });
 }
 
 loginBtn.onclick = () => auth('login');
@@ -75,14 +93,17 @@ socket.on('auth_success', ({ token, username }) => {
 });
 
 socket.on('auth_error', ({ message }) => {
+  setAuthDisabled(false);
   authMsg.textContent = message;
 });
 
 confirmCharacterBtn.onclick = () => {
-  if (!selectedCharacter) {
-    alert('Selecione um personagem.');
+  if (!selectedCharacter || !authToken) {
+    alert('Selecione um personagem e faça login.');
     return;
   }
+
+  confirmCharacterBtn.disabled = true;
   socket.emit('start_game', { token: authToken, characterId: selectedCharacter.id, color: selectedCharacter.color });
   showLoading('game');
 };
@@ -92,6 +113,7 @@ socket.on('game_started', ({ you, allPlayers }) => {
   Object.keys(players).forEach((id) => delete players[id]);
   Object.assign(players, allPlayers);
   playerInfo.textContent = `Jogador: ${currentUser} | Personagem: ${selectedCharacter?.name || '-'}`;
+  confirmCharacterBtn.disabled = false;
 });
 
 socket.on('new_player', (player) => { players[player.id] = player; });
